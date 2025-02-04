@@ -1,0 +1,80 @@
+from bs4 import BeautifulSoup
+from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.common.exceptions import TimeoutException
+from webdriver_manager.chrome import ChromeDriverManager
+import pandas as pd
+
+url = "https://www.brilliantearth.com/Petite-Lab-Diamond-Tube-Ring-(1-1/2-ct.-tw.)-14K-Gold-BE2D629LC/"
+
+def setup_driver():
+    chrome_options = Options()
+    chrome_options.add_argument('--disable-gpu')
+    chrome_options.add_argument('--no-sandbox')
+    chrome_options.add_argument('--disable-dev-shm-usage')
+
+    service = Service(ChromeDriverManager().install())
+    driver = webdriver.Chrome(service=service, options=chrome_options)
+    driver.implicitly_wait(10)
+    
+    return driver
+
+def save_page_source():
+    """ Fetches the webpage using Selenium and saves the HTML source. """
+    driver = setup_driver()
+    driver.get(url)
+
+    try:
+        WebDriverWait(driver, 15).until(EC.presence_of_element_located((By.TAG_NAME, "body")))
+        print("Page loaded successfully.")
+    except TimeoutException:
+        print("Page took too long to load.")
+    
+    # Get full page source
+    html = driver.page_source
+    
+    # Save the page source
+    with open("page_source.html", "w", encoding="utf-8") as file:
+        file.write(html)
+
+    print("Page source saved successfully.")
+    
+    driver.quit()
+
+def extract_data():
+    """ Reads the saved HTML file and extracts product information. """
+    with open("page_source.html", "r", encoding="utf-8") as file:
+        html = file.read()
+
+    # Parse with BeautifulSoup
+    soup = BeautifulSoup(html, "html.parser")
+
+    # Extract single product name
+    product_name_tag = soup.find("h1", class_="heading")
+    product_name = product_name_tag.text.strip() if product_name_tag else "N/A"
+
+    # Extract image links
+    img_divs = soup.find_all("div", class_="zoom-element")
+    img_links = []
+    
+    for div in img_divs:
+        img_tags = div.find_all("img", class_="img-responsive")  
+        for img in img_tags:
+            if img.has_attr("src"):
+                img_url = img["src"]
+                if img_url.startswith("//image"):
+                    img_links.append("https:" + img_url)  # Convert to absolute URL
+
+    # Save extracted data to an Excel file
+    df = pd.DataFrame({"Product Name": [product_name], "Image Links": [", ".join(img_links)]})
+    df.to_excel("product_data.xlsx", index=False, engine="openpyxl")
+
+    print("Data extracted and saved to 'product_data.xlsx'.")
+
+# Run the functions in sequence
+save_page_source()  # Fetch and save HTML
+extract_data()      # Process and save extracted data
