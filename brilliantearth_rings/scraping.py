@@ -9,8 +9,6 @@ from selenium.common.exceptions import TimeoutException
 from webdriver_manager.chrome import ChromeDriverManager
 import pandas as pd
 
-url = "https://www.brilliantearth.com/Petite-Lab-Diamond-Tube-Ring-(1-1/2-ct.-tw.)-14K-Gold-BE2D629LC/"
-
 def setup_driver():
     chrome_options = Options()
     chrome_options.add_argument('--disable-gpu')
@@ -23,7 +21,7 @@ def setup_driver():
     
     return driver
 
-def save_page_source():
+def save_page_source(url):
     """ Fetches the webpage using Selenium and saves the HTML source. """
     driver = setup_driver()
     driver.get(url)
@@ -44,6 +42,8 @@ def save_page_source():
     print("Page source saved successfully.")
     
     driver.quit()
+    data = extract_data()      # Process and save extracted data
+    return data
 
 def extract_data():
     """ Reads the saved HTML file and extracts product information. """
@@ -61,6 +61,14 @@ def extract_data():
     img_divs = soup.find_all("div", class_="zoom-element")
     img_links = []
     
+    video_divs = soup.find_all(lambda tag: tag.name == "video")
+    video_links = []
+    
+    for video in video_divs:
+            if video.has_attr("src"):
+                video_links.append(video["src"])
+    
+    
     for div in img_divs:
         img_tags = div.find_all("img", class_="img-responsive")  
         for img in img_tags:
@@ -70,11 +78,21 @@ def extract_data():
                     img_links.append("https:" + img_url)  # Convert to absolute URL
 
     # Save extracted data to an Excel file
-    df = pd.DataFrame({"Product Name": [product_name], "Image Links": [", ".join(img_links)]})
-    df.to_excel("product_data.xlsx", index=False, engine="openpyxl")
+    # df = pd.DataFrame({"Product Name": product_name, "Image Links": [", ".join(img_links)]})
+    # df.to_excel("product_data.xlsx", index=False, engine="openpyxl")
 
-    print("Data extracted and saved to 'product_data.xlsx'.")
+    print(f"Data extracted")
+    
+    return {
+        'Product Name' : product_name,
+        'Image Links': [", ".join(img_links)],
+        'Video Links' : video_links
+    }
+    
 
 # Run the functions in sequence
-save_page_source()  # Fetch and save HTML
-extract_data()      # Process and save extracted data
+
+if __name__ == "__main__":
+    # url = "https://www.brilliantearth.com/Toi-et-Moi-Morganite-and-Pink-Tourmaline-Cocktail-Ring-Gold-BE2MO500/?="
+    save_page_source(url)  # Fetch and save HTML
+    

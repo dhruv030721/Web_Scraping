@@ -3,3 +3,7 @@ shy_moissanite_scraping/env
 shy_moissanite_scraping/__pycache__
 brilliantearth_rings/__pycache__
 brilliantearth_rings/env
+brilliantearth_rings/product_links.json
+brilliantearth_rings/product_data.xlsx
+brilliantearth_rings/page_source.html
+brilliantearth_rings/products.html
