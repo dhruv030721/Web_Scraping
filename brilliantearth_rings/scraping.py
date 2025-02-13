@@ -1,3 +1,4 @@
+import os
 from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
@@ -42,7 +43,7 @@ def save_page_source(url):
     print("Page source saved successfully.")
     
     driver.quit()
-    data = extract_data()      # Process and save extracted data
+    data = extract_data()  # Process and save extracted data
     return data
 
 def extract_data():
@@ -65,9 +66,8 @@ def extract_data():
     video_links = []
     
     for video in video_divs:
-            if video.has_attr("src"):
-                video_links.append(video["src"])
-    
+        if video.has_attr("src"):
+            video_links.append(video["src"])
     
     for div in img_divs:
         img_tags = div.find_all("img", class_="img-responsive")  
@@ -77,22 +77,28 @@ def extract_data():
                 if img_url.startswith("//image"):
                     img_links.append("https:" + img_url)  # Convert to absolute URL
 
-    # Save extracted data to an Excel file
-    # df = pd.DataFrame({"Product Name": product_name, "Image Links": [", ".join(img_links)]})
-    # df.to_excel("product_data.xlsx", index=False, engine="openpyxl")
+    # Extract iframe src from #thumb-video
+    thumb_video_div = soup.find("div", id="thumb-video")
+    iframe_src = "N/A"
 
-    print(f"Data extracted")
-    
-    return {
-        'Product Name' : product_name,
+    if thumb_video_div:
+        iframe_tag = thumb_video_div.find("iframe")
+        if iframe_tag and iframe_tag.has_attr("src"):
+            iframe_src = iframe_tag["src"]
+
+    print({
+        'Product Name': product_name,
         'Image Links': [", ".join(img_links)],
-        'Video Links' : video_links
+        'Iframe Link': iframe_src
+    })
+
+    return {
+        'Product Name': product_name,
+        'Image Links': [", ".join(img_links)],
+        'Iframe Link': iframe_src
     }
-    
 
 # Run the functions in sequence
-
 if __name__ == "__main__":
-    # url = "https://www.brilliantearth.com/Toi-et-Moi-Morganite-and-Pink-Tourmaline-Cocktail-Ring-Gold-BE2MO500/?="
+    # url = "https://www.brilliantearth.com/Callista-Diamond-Ring-Rose-Gold-BE1D3975-17564638/"
     save_page_source(url)  # Fetch and save HTML
-    
