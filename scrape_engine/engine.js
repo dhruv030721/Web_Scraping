@@ -4,7 +4,7 @@ const axios = require('axios');
 // Function to read JSON data
 function readJson() {
     try {
-        const data = fs.readFileSync('./product_links.json', 'utf8');
+        const data = fs.readFileSync('./links.json', 'utf8');
         return JSON.parse(data);
     } catch (error) {
         console.error('Error reading JSON file:', error);
