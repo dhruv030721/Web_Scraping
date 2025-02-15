@@ -24,7 +24,7 @@ app.post('/scrape', async(req, res) => {
 
     const html_content = await scrapeHtml(url)
 
-    const response  = await axios.post("http://37.27.81.8:5001/scrape", {
+    const response  = await axios.post("http://localhost:5001/scrape", {
         url
     })
 
