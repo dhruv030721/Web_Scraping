@@ -4,7 +4,7 @@ const axios = require('axios');
 // Function to read JSON data
 function readJson() {
     try {
-        const data = fs.readFileSync('./links copy.json', 'utf8');
+        const data = fs.readFileSync('./links.json', 'utf8');
         return JSON.parse(data);
     } catch (error) {
         console.error('Error reading JSON file:', error);
@@ -12,7 +12,7 @@ function readJson() {
     }
 }
 
-// Function to send a POST request
+// Function to send a  POST request
 async function sendPostRequest(url) {
     try {
         // const response = await axios.post("http://37.27.81.8:9010/scrape", { url }); // Replace with your payload
