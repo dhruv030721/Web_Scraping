@@ -31,64 +31,73 @@ def scrape(data: ScrapeRequest):
     product_name_tag = soup.find("h1", class_="heading")
     product_name = product_name_tag.text.strip() if product_name_tag else "N/A"
     
-    product_detail_div = soup.find("div", class_="JS-Diamond-details")
+    product_detail_div = soup.find("div", class_="panel")
     
     dt_tags = product_detail_div.find_all("dt")
     dd_tags = product_detail_div.find_all("dd")
     
+    carat_size = soup.find("p", class_="title_slider_carat")
+    value_text = carat_size.find(text=True, recursive=False).strip()
+    print(f"Carat Size: {value_text}")
+    
+    product_details = []
+    
     for dt, dd in zip(dt_tags, dd_tags):
+        product_details.append(f"{dt.text.strip()} {dd.text.strip()}")
         print(f"{dt.text.strip()}: {dd.text.strip()}")
     
 
     # Extract image links
-    img_divs = soup.find_all("div", class_="zoom-element")
-    img_links = []
+    # img_divs = soup.find_all("div", class_="zoom-element")
+    # img_links = []
     
-    video_divs = soup.find_all(lambda tag: tag.name == "video")
-    video_links = []
+    # video_divs = soup.find_all(lambda tag: tag.name == "video")
+    # video_links = []
     
-    for video in video_divs:
-        if video.has_attr("src"):
-            video_links.append(video["src"])
+    # for video in videoS_divs:
+    #     if video.has_attr("src"):
+    #         video_links.append(video["src"])
     
-    for div in img_divs:
-        img_tags = div.find_all("img", class_="img-responsive")  
-        for img in img_tags:
-            if img.has_attr("src"):
-                img_url = img["src"]
-                if img_url.startswith("//image"):
-                    img_links.append("https:" + img_url)  # Convert to absolute URL
+    # for div in img_divs:
+    #     img_tags = div.find_all("img", class_="img-responsive")  
+    #     for img in img_tags:
+    #         if img.has_attr("src"):
+    #             img_url = img["src"]
+    #             if img_url.startswith("//image"):
+    #                 img_links.append("https:" + img_url)  # Convert to absolute URL
 
     # Extract iframe src from #thumb-video
-    thumb_video_div = soup.find("div", id="thumb-video")
-    iframe_src = "N/A"
+    # thumb_video_div = soup.find("div", id="thumb-video")
+    # iframe_src = "N/A"
 
-    if thumb_video_div:
-        iframe_tag = thumb_video_div.find("iframe")
-        if iframe_tag and iframe_tag.has_attr("src"):
-            iframe_src = iframe_tag["src"]
+    # if thumb_video_div:
+    #     iframe_tag = thumb_video_div.find("iframe")
+    #     if iframe_tag and iframe_tag.has_attr("src"):
+    #         iframe_src = iframe_tag["src"]
             
-    # Prepare product data
-    iframe_link = iframe_src
-    if isinstance(iframe_link, str):  # Ensure it's a string before modification
-        iframe_link = iframe_link.lstrip("//")
+    # # Prepare product data
+    # iframe_link = iframe_src
+    # if isinstance(iframe_link, str):  # Ensure it's a string before modification
+    #     iframe_link = iframe_link.lstrip("//")
             
     
     excel_file = "product_data.xlsx"
     # Ensure the Excel file exists; if not, create it with headers
     if not os.path.exists(excel_file):
-        df = pd.DataFrame(columns=["Link", "Product Name", "Image Links", "Iframe Link"])
+        df = pd.DataFrame(columns=["Link", "Product Name", "Carat Size", "Product Details"])
         df.to_excel(excel_file, index=False)
         print("Created a new Excel file.")
         
-      # Load existing Excel file to append new data
+    # Load existing Excel file to append new data
     existing_df = pd.read_excel(excel_file)
     
     product_info = {
         "Link": data.url,
         "Product Name": product_name,
-        "Image Links": ", ".join(img_links),  # Convert list to string safely
-        "Iframe Link": iframe_link
+        # "Image Links": ", ".join(img_links),  # Convert list to string safely
+        # "Iframe Link": iframe_link,
+        "Carat Size": value_text,
+        "Product Details": ", ".join(product_details),
     }
     
     # print({ "Link": data.url,

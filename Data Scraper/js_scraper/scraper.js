@@ -74,14 +74,12 @@ function readJson(){
 // This is function is used to srape HTML content 
 async function scrapeHtml(url){
     const browser = await puppeteer.launch({
-        executablePath: '/usr/bin/chromium-browser',
-        headless: "new", 
+        headless: false,
         args: [
-            '--no-sandbox',
-            '--disable-setuid-sandbox',
             '--disable-gpu',
             '--disable-dev-shm-usage'
-        ]
+        ],
+        defaultViewport: null
     });
 
     console.log("Browser Launched!")
@@ -93,7 +91,8 @@ async function scrapeHtml(url){
     console.log(`${url} this product data scraping started ...................`)
 
     await page.goto(url, {
-        waitUntil: 'networkidle2'
+        waitUntil: 'networkidle2',
+        timeout: 0
     });
 
     await page.waitForSelector('body');
