@@ -1,4 +1,4 @@
-const puppeteer = require('puppeteer');
+const puppeteer = require('puppeteer-core');
 const express = require('express')
 const fs = require('fs');
 const morgan = require('morgan')
@@ -72,6 +72,7 @@ function readJson(){
 
 // This is function is used to srape HTML content 
 async function scrapeHtml(url){
+/*
     const browser = await puppeteer.launch({
         executablePath: '/usr/bin/chromium-browser',
         headless: "new", 
@@ -82,6 +83,11 @@ async function scrapeHtml(url){
             '--disable-dev-shm-usage'
         ]
     });
+*/
+    const browser = await puppeteer.launch({
+	  executablePath: '/usr/bin/google-chrome',
+	  args: ['--no-sandbox', '--disable-setuid-sandbox']
+	});
 
     console.log("Browser Launched!")
 

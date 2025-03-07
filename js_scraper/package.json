@@ -3,6 +3,7 @@
     "axios": "^1.7.9",
     "express": "^4.21.2",
     "morgan": "^1.10.0",
-    "puppeteer": "^24.2.0"
+    "puppeteer": "^24.2.0",
+    "puppeteer-core": "^24.4.0"
   }
 }
