@@ -75,7 +75,7 @@ async function scrapeHtml(url){
 /*
     const browser = await puppeteer.launch({
         executablePath: '/usr/bin/chromium-browser',
-        headless: "new", 
+        headless: false, 
         args: [
             '--no-sandbox',
             '--disable-setuid-sandbox',
@@ -99,6 +99,14 @@ async function scrapeHtml(url){
 
     await page.goto(url, {
         waitUntil: 'networkidle2'
+    });
+
+    await page.waitForSelector('#imageZoom', { timeout: 5000 }).catch(() => console.log('Image not found'));
+    
+    await page.evaluate(() => {
+        document.querySelectorAll('img').forEach(img => {
+            img.src = img.src; // Force load images
+        });
     });
 
     await page.waitForSelector('body');

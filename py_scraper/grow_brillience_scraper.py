@@ -29,12 +29,8 @@ def scrape(data: ScrapeRequest):
 
     # Extract single product name
     product_name_div = soup.find("div", class_="pro-name")
-    if product_name_div:
-      product_name_tag = product_name_div.find("h1", class_="sub-hd")
-      product_name = product_name_tag.text.strip() if product_name_tag else "N/A"
-    else:
-      product_name = "N/A"
-
+    product_name_tag = product_name_div.find("h1", class_="sub-hd")
+    product_name = product_name_tag.text.strip() if product_name_tag else "N/A"
 
     # Extract image links (all images with id="imageZoom")
     img_tags = soup.find_all("img", id="imageZoom")
