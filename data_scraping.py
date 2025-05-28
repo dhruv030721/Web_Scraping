@@ -179,26 +179,29 @@ def scrape_product_data(page, link):
 
 
 def scrape_product(link):
-    """Scrape a single product page."""
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=False)  # Use headless=True for silent execution
-        page = browser.new_page()
+        browser = p.chromium.launch(headless=True)
+        context = browser.new_context(
+            user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36",
+            viewport={"width": 1920, "height": 1080},
+            extra_http_headers={
+                "Accept-Language": "en-US,en;q=0.9",
+                "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8"
+            }
+        )
+        page = context.new_page()
 
         try:
             print(f"Opening: {link}")
             page.goto(link, timeout=60000)
-
-            # Process variations and collect data
             product_data = scrape_product_variations(page, link)
-
-            # Save all collected data to Excel
             for product_info in product_data:
                 save_to_excel(product_info)
-
         except Exception as e:
             print(f"Error scraping {link}: {e}")
-
-        browser.close()
+        finally:
+            context.close()
+            browser.close()
 
 
 def main():
@@ -207,8 +210,17 @@ def main():
     ensure_excel_file()
 
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=False)
-        page = browser.new_page()
+        browser = p.chromium.launch(headless=True)
+        context = browser.new_context(
+            user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36",
+            viewport={"width": 1920, "height": 1080},
+            extra_http_headers={
+                "Accept-Language": "en-US,en;q=0.9",
+                "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8"
+            }
+        )
+        page = context.new_page()
+
         page.goto("https://www.brilliantearth.com/engagement-rings/solitaire/")
 
         # Load more products by scrolling
